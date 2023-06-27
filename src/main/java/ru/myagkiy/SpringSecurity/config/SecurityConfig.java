@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         //Разрешаем не авторизованному пользователю доступ на страницу login
-                        auth -> auth.requestMatchers("/auth/login")
+                        auth -> auth.requestMatchers("/auth/login","/auth/registration")
                                 .permitAll()
                                 // для всех остальных страниц нужна аутентификация
                                 .anyRequest()

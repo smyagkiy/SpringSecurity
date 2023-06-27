@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration</title>
+</head>
+<body>
+<form th:action="@{/auth/registration}" th:method="POST" th:object="${person}">
+    <label for="username">UserName</label>
+    <input type="text" id="username" th:field="*{name}"/>
+    <br/>
+    <label for="password">Password</label>
+    <input type="password" id="password" th:field="*{password}">
+    <br/>
+    <label for="year_of_beard">Year of beard</label>
+    <input type="text" id="year_of_beard" th:field="*{yearOfBeard}">
+    <br/>
+    <input type="submit" value="Create person">
+</form>
+</body>
+</html>
