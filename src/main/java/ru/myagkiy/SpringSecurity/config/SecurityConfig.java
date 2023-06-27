@@ -8,7 +8,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import ru.myagkiy.SpringSecurity.services.PersonDetailService;
@@ -33,13 +33,13 @@ public class SecurityConfig {
         return http
                 //отключаем защиту межсайтовой подделки запросов
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(
-                        //Разрешаем не авторизованному пользователю доступ на страницу login
-                        auth -> auth.requestMatchers("/auth/login","/auth/registration")
-                                .permitAll()
-                                // для всех остальных страниц нужна аутентификация
-                                .anyRequest()
-                                .authenticated())
+                //Разрешаем не авторизованному пользователю доступ на страницу login
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/auth/login", "/auth/registration")
+                        .permitAll()
+                        // для всех остальных страниц нужна аутентификация
+                        .anyRequest()
+                        .authenticated())
                 //указываем адрес кастомной страницы аутентификации
                 .formLogin(form -> form
                         .loginPage("/auth/login")
@@ -49,13 +49,17 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/hello", true)
                         //если пользовательские данные были введены неверно, то перенаправляем на страницу
                         .failureUrl("/auth/login?error"))
+                //выход пользователя из профиля и перенаправление на страницу с авторизацией
+                .logout(log -> log
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/auth/login"))
                 .build();
     }
 
-    //Указываем способ шифрования пароля пользователя(сейчас нет шифрования)
+    //Указываем способ шифрования пароля пользователя
     @Bean
     public PasswordEncoder getPasswordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
     }
 }
 
