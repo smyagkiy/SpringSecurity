@@ -13,4 +13,5 @@ public class Person {
     private String name;
     private int yearOfBeard;
     private String password;
+    private String role;
 }

@@ -5,9 +5,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -16,6 +16,7 @@ import ru.myagkiy.SpringSecurity.services.PersonDetailService;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableMethodSecurity // нужна для работы @PreAuthorize
 public class SecurityConfig {
     private final PersonDetailService personDetailService;
 
@@ -32,14 +33,16 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 //отключаем защиту межсайтовой подделки запросов
-                .csrf(AbstractHttpConfigurer::disable)
+                //.csrf(AbstractHttpConfigurer::disable)
                 //Разрешаем не авторизованному пользователю доступ на страницу login
                 .authorizeHttpRequests(auth -> auth
+                        //ограничение доступа по роли на уровне метода в коде
+                        //.requestMatchers("/admin").hasRole("ADMIN")
                         .requestMatchers("/auth/login", "/auth/registration")
                         .permitAll()
+                        .anyRequest().authenticated())
+                        //.anyRequest().hasAnyRole("USER","ADMIN"))
                         // для всех остальных страниц нужна аутентификация
-                        .anyRequest()
-                        .authenticated())
                 //указываем адрес кастомной страницы аутентификации
                 .formLogin(form -> form
                         .loginPage("/auth/login")
